@@ -1,0 +1,182 @@
+#
+param Tmax;
+param lambda := 1/5; # have not decided yet
+set J := 0 .. 37;
+set Hotel; # the set of 5 hotels;
+set A; # attractions
+set D; # dining places;
+
+set Out; # outdoors;
+set In; # indoor
+
+set C; # center region
+set E; # East region
+set W; # west region
+set N; # north region
+set O; # other region
+
+set T = 0 .. Tmax;
+set RL := 18 .. 30; # time for lunch
+set RD := 54 .. 66; # time for dinner
+set BO := 12 .. 41; # banned time for outdoor activities
+
+
+
+param process{A union D};
+param ac{A};
+param dis{J, J};
+param tim{J, J};
+
+
+
+var x{J, T, T} binary;
+var y{J, J, T} binary;
+var w{J, T, T} binary;
+var z{J, J, T} binary;
+var h{Hotel, Hotel} binary;
+var uC binary;
+var uE binary;
+var uW binary;
+var uN binary;
+var uO binary;
+
+maximize Diversity_weighted_with_budget:
+	sum{i in A, t in T, p in T} (x[i, t, p] + w[i, t, p]) - lambda * ( 0.0001 * sum{l in J, m in J, t in T} (dis[l, m] * (y[l, m, t] + z[l, m, t])) + sum{j in A, t in T, p in T} (ac[j] * (x[j, t, p] + w[j, t, p])));
+
+subject to EachAttractionVisitOnlyOneTimes {j in J diff Hotel}: sum{t in T, p in T} (x[j, t, p] + w[j, t, p]) <= 1;
+subject to EachPathGoThroughOneTimes       {i in J, j in J}:    sum{t in T} (y[i, j, t] + z[i, j, t]) <= 1;
+
+
+subject to DayOneOneInstance  {t in T}:  sum{j in J, s in T, p in T: p>=t-s+1 and s <= t} x[j, s, p] +  sum{l in J, m in J, s in T: s >= max(0, t+1-tim[l, m]) && s <= t} y[l, m, s] <= 1;
+
+subject to DayTwoOneInstance  {t in T}:  sum{j in J, s in T, p in T: p>=t-s+1 and s <= t} w[j, s, p] +  sum{l in J, m in J, s in T: s >= max(0, t+1-tim[l, m]) && s <= t} z[l, m, s] <= 1;
+
+
+subject to MustHaveLunchDayOne: sum{j in D, t in T, p in T: t + p in RL and t in RL} x[j, t, p] = 1;
+subject to MustHaveLunchDayTwo: sum{j in D, t in T, p in T: t + p in RL and t in RL} w[j, t, p] = 1;
+subject to MustHaveDinnerDayOne: sum{j in D, t in T, p in T: t + p in RD and t in RD} x[j, t, p] = 1;
+subject to MustHaveDinnerDayTwo: sum{j in D, t in T, p in T: t + p in RD and t in RD} w[j, t, p] = 1;
+subject to ExactTwoMealsDayOne: sum{j in D, t in T, p in T} x[j,t,p] = 2;
+subject to ExactTwoMealsDayTwo: sum{j in D, t in T, p in T} w[j,t,p] = 2;
+
+
+
+subject to AtLeastThreeOutDoorDayOne: sum{j in Out, t in T, p in T} x[j, t, p] >= 3;
+subject to AtLeastThreeOutDoorDayTwo: sum{j in Out, t in T, p in T} w[j, t, p] >= 3;
+
+
+
+subject to NoOutdoorTimeDayOne {j in Out, t in T, p in T: t in BO || t + p in BO || (t < 12 && t + p > 41)}: x[j, t, p] = 0;
+subject to NoOutdoorTimeDayTwo {j in Out, t in T, p in T: t in BO || t + p in BO || (t < 12 && t + p > 41)}: w[j, t, p] = 0;
+
+
+
+
+subject to IfGoToRegionC1:  sum{j in C, t in T, p in T} (x[j, t, p] + w[j, t, p]) >= uC;
+subject to IfGoToRegionC2:  sum{j in C, t in T, p in T} (x[j, t, p] + w[j, t, p]) <= 100*uC;
+
+subject to IfGoToRegionN1:  sum{j in N, t in T, p in T} (x[j, t, p] + w[j, t, p]) >= uN;
+subject to IfGoToRegionN2:  sum{j in N, t in T, p in T} (x[j, t, p] + w[j, t, p]) <= 100*uN;
+
+subject to IfGoToRegionE1:  sum{j in E, t in T, p in T} (x[j, t, p] + w[j, t, p]) >= uE;
+subject to IfGoToRegionE2:  sum{j in E, t in T, p in T} (x[j, t, p] + w[j, t, p]) <= 100*uE;
+
+subject to IfGoToRegionW1:  sum{j in W, t in T, p in T} (x[j, t, p] + w[j, t, p]) >= uW;
+subject to IfGoToRegionW2:  sum{j in W, t in T, p in T} (x[j, t, p] + w[j, t, p]) <= 100*uW;
+
+subject to IfGoToRegionO1:  sum{j in O, t in T, p in T} (x[j, t, p] + w[j, t, p]) >= uO;
+subject to IfGoToRegionO2:  sum{j in O, t in T, p in T} (x[j, t, p] + w[j, t, p]) <= 100*uO;
+
+subject to AtLeastFourRegion: uC + uN + uE + uW + uO >= 4;
+
+
+
+
+subject to MakeLoopDayOneIn {j in J, t in T: t >= 1 and t <= Tmax}: sum {k in J diff {j}} y[k, j, max(t-tim[k, j], 0)] = sum{p in T} x[j, t, p];
+subject to MakeLoopDayTwoIn {j in J, t in T: t >= 1 and t <= Tmax}: sum {k in J diff {j}} z[k, j, max(t-tim[k, j], 0)] = sum{p in T} w[j, t, p];
+
+subject to MakeLoopDayOneOut {j in J, t in T: 0 <= t and t <= Tmax-1}: sum {k in J diff {j}} y[j, k, t] = sum {s in T, p in T: s+p == t} x[j, s, p];
+subject to MakeLoopDayTwoOut {j in J, t in T: 0 <= t and t <= Tmax-1}: sum {k in J diff {j}} z[j, k, t] = sum {s in T, p in T: s+p == t} w[j, s, p];
+# subject to MakeLoopDayTwoOut {j in J, t in T: 0 <= t and t <= Tmax-1}: sum {k in J diff {j}} z[j, k, min(t+p, Tmax)] >= w[j, t, p];
+
+
+
+
+
+subject to ConditionAboutChangingHotel1 {i in Hotel, j in Hotel}: x[i, 0, 0] + sum {t in T} y[i, j, t] + x[j, Tmax, 0] + w[j, 0, 0] + w[j, Tmax, 0] >= 5 - 5 * (1 - h[i, j]);
+
+subject to ConditionAboutChangingHotel2: sum{i in Hotel, j in Hotel} h[i, j] = 1;
+subject to ConditionAboutChangingHotel3: sum{i in Hotel} x[i, 0, 0] = 1;
+subject to ConditionAboutChangingHotel4: sum{i in Hotel} x[i, Tmax, 0] = 1;
+subject to ConditionAboutChangingHotel5: sum{i in Hotel} w[i, 0, 0] = 1;
+subject to ConditionAboutChangingHotel6: sum{i in Hotel} w[i, Tmax, 0] = 1;
+
+
+
+subject to NoFromJtoJ {j in A union D, t in T}: y[j, j, t] = 0;
+
+
+subject to LeaveHotelImmediatelyDayOne {i in Hotel, p in T: p >= 1}: x[i, 0, p] = 0;
+subject to LeaveHotelImmediatelyDayTwo {i in Hotel, p in T: p >= 1}: w[i, 0, p] = 0;
+
+
+
+subject to AllActivitiesLongEnoughDayOne {j in A union D, t in T, p in T: p < process[j]}: x[j, t, p] = 0 ;
+subject to AllActivitiesLongEnoughDayTwo {j in A union D, t in T, p in T: p < process[j]}: w[j, t, p] = 0 ;
+
+
+subject to AllActivitiesBeforeNineDayOne {j in J, t in T, p in T: p + t > Tmax}: x[j, t, p] = 0;
+subject to AllActivitiesBeforeNineDayTwo {j in J, t in T, p in T: p + t > Tmax}: w[j, t, p] = 0;
+
+subject to AllTransportationBeforeNineDayOne {i in J, j in J, t in T: tim[i,j] + t > Tmax}: y[i,j,t] = 0; 
+subject to AllTransportationBeforeNineDayTwo {i in J, j in J, t in T: tim[i,j] + t > Tmax}: z[i,j,t] = 0; 
+
+
+
+
+
+
+
+#subject to c1: x[33,0,30] = 1;
+#subject to c2: x[12,31,40] = 1;
+#subject to c3: x[33,72,0] = 1;
+#subject to c4: y[33,12,30] = 1;
+#subject to c5: y[12,33,71] = 1;
+#subject to c6: sum{j in J, t in T, p in T} x[j,t,p] = 3;
+#subject to c7: sum{i in J, j in J, t in T} y[i,j,t] = 2;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

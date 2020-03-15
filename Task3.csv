@@ -1,0 +1,39 @@
+﻿Attraction,Attraction name,Region,Cost (SGD),Indoor/Outdoor,Longtitude,Latitude
+D1,Jamie's Italian,C,-,-,1.306215,103.828996
+D2,Odette,C,-,-,1.289691,103.851523
+D3,Timbre+,C,-,-,1.297356,103.78762
+D4,Simpang Bedok,E,-,-,1.331542,103.94843
+D5,Tian Tian Hainanese Chicken Rice Bedok,E,-,-,1.333471,103.948281
+D6,Orchid Live Seafood,N,-,-,1.419854,103.824929
+D7,Chomp Chomp Food Centre,O,-,-,1.364293,103.866631
+D8,Punggol Nasi lemak,O,-,-,1.361863,103.886755
+D9,Buey Tahan See-Food CCK,W,-,-,1.374087,103.746227
+D10,Miam Miam French & Japanese Cafe Kitchen,W,-,-,1.33438,103.742746
+A1,1-Altitude,C,40,Indoor,1.284935,103.851099
+A2,ArtScience Museum,C,30,Indoor,1.286281,103.859254
+A3,Botanic Gardens,C,5,Outdoor,1.313842,103.815896
+A4,Fort Canning Art Centre,C,30,Indoor,1.295256,103.846911
+A5,Gardens by the bay,C,20,Indoor,1.281563,103.863603
+A6,Haw Par Villa,C,10,Outdoor,1.284282,103.782507
+A7,Universal Studios Singapore,C,81,Outdoor,1.253994,103.823822
+A8,East Coast Park,E,0,Outdoor,1.304462,103.926145
+A9,Jewel Changi Airport,E,20,Indoor,1.361038,103.989906
+A10,Pulau Ubin,E,10,Outdoor,1.410067,103.950899
+A11,Wild Wild Wet,E,32,Outdoor,1.376735,103.956077
+A12,Yunomori Onsena & Spa,E,99,Indoor,1.304424,103.871956
+A13,Night Safari,N,50,Outdoor,1.404552,103.789192
+A14,Singapore Zoo,N,40,Outdoor,1.404552,103.789192
+A15,Sungei Buloh Wetland Reserve,N,0,Outdoor,1.444963,103.729725
+A16,River Safari,N,41,Indoor,1.404552,103.789192
+A17,Coney Island,O,15,Outdoor,1.416134,103.915228
+A18,Punggol Waterway Park,O,0,Outdoor,1.411044,103.904662
+A19,Chinese Garden,W,5,Outdoor,1.342655,103.731837
+A20,Jurong Bird Park,W,35,Outdoor,1.321125,103.7069
+A21,Science Centre Singapore,W,12,Indoor,1.333828,103.736804
+A22,Singapore Discovery Centre,W,15,Indoor,1.330366,103.675337
+A23,The Rink,W,22,Indoor,1.333554,103.740682
+H1,Mandarin Orchard Singapore,C,-,-,1.302016,103.835719
+H2,Oasia Residence Singapore,W,-,-,1.299347,103.764578
+H3,Crowne Plaza Hotel @Changi,E,-,-,1.359322,103.9883
+H4,Orchid Country Club,N,-,-,1.414951,103.844199
+H5,Hilton Garden Inn Singapore Serangoon,O,-,-,1.308247,103.85216

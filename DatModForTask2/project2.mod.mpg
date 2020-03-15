@@ -1,0 +1,126 @@
+
+
+# the interpretation of the model is in the report.
+#
+param maxT;
+set J := 0 .. 33; # all activities 
+set H; #hotel
+set A; # attractions
+set D; # dining places 
+
+set Out; # outdoors 
+set In; #indoors
+set C; # regions center
+set E; # regions East
+set W; # regions West
+set N; # regions North
+set O; # regions O
+
+set T := 0..maxT; # time intervals
+set RL := 18..30; # release time of lunch
+set RD := 54..66; # release time of dinner
+set RO := 12..42; # banned time of outdoor activities
+
+
+param pa ; # the time spend on each attraction
+param pd ; # the time spend on each dinning place
+param dis{J, J};
+param tim{J, J};
+param ac{A};
+
+var x{J ,T} binary;
+var y{J, J, T} binary;
+var uN binary;
+var uE binary;
+var uW binary;
+var uO binary;
+
+
+
+minimize WeightedDistance: 
+	0.0001 * sum{l in J, m in J, t in T} dis[l, m] * y[l, m,t] + sum{j in A, t in T} ac[j] * x[j, t];
+
+subject to C1a {j in J diff H}: sum{t in T} x[j,t] <= 1;
+subject to C1b {l in J, m in J}: sum{t in T} y[l, m, t] <= 1;
+
+
+subject to C2 {t in T: t <= card(T) - 1}: 
+	sum{j in A, s in T: s >= max(0, t + 1 - pa) && s <= t} x[j,s] + sum{j in D, s in T: s >= max(0, t + 1 - pd) && s <= t} x[j, s] + sum{l in J, m in J, s in T: s >= max(0, t + 1 - tim[l, m]) && s <= t} y[l, m, s] <= 1;
+
+subject to C3 {j in D, t in T: t not in RL union RD}: x[j,t] = 0;
+
+subject to C4: sum{j in A, t in T} x[j,t] >= 8;
+
+subject to C5: sum{j in Out, t in T} x[j,t] >= 3;
+
+subject to C6 {j in Out, t in RO}: x[j,t] = 0;
+
+
+
+
+
+subject to C7a: sum{j in N, t in T} x[j,t] >= uN;
+subject to C7b: sum{j in N, t in T} x[j,t] <= 10000 * uN;
+
+
+subject to C7c: sum{j in E, t in T} x[j,t] >= uE;
+subject to C7d: sum{j in E, t in T} x[j,t] <= 10000 * uE;
+
+
+subject to C7e: sum{j in W, t in T} x[j,t] >= uW;
+subject to C7f: sum{j in W, t in T} x[j,t] <= 10000 * uW;
+
+
+subject to C7g: sum{j in O, t in T} x[j,t] >= uO;
+subject to C7h: sum{j in O, t in T} x[j,t] <= 10000 * uO;
+
+subject to C7i: uN + uE + uW + uO >= 2;
+
+
+
+
+
+subject to C8a {j in J, t in T: t >= 1}: sum{k in J diff {j}} y[k, j, max(0, t - tim[k, j])] = x[j, t] ;
+subject to C8b {j in A, t in T: t <= card(T) - 1}: sum{k in J diff {j}} y[j, k, min(maxT, t + pa)] = x[j, t];
+subject to C8c {j in D, t in T: t <= card(T) - 1}: sum{k in J diff {j}} y[j, k, min(maxT, t + pd)] = x[j, t];
+subject to C8d: sum{j in J} y[33, j, 1] = 1;
+
+
+subject to C9a: x[33, 0] = 1;
+subject to C9b: x[33, maxT] = 1;
+
+
+
+subject to C10 {j in J, t in T}: y[j, j, t] = 0;
+
+
+subject to C11 {t in T}: sum{j in J} x[j, t] + sum{l in J, m in J} y[l, m, t] <= 1;
+
+
+
+subject to C12a: sum{j in D, t in RL} x[j, t] = 1;
+subject to C12b: sum{j in D, t in RD} x[j, t] = 1;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
